@@ -100,13 +100,13 @@ button.warn-btn:hover{background:#FAEEDA}
 
   <!-- CLIENTS -->
   <div id="step-main" class="step active">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div style="margin-bottom:10px">
       <span style="font-size:16px;font-weight:600">Clients</span>
-      <button class="primary" onclick="addClient()"><i class="ti ti-plus"></i> Add client</button>
     </div>
     <div id="clients-list"></div>
-    <div style="margin-bottom:10px">
+    <div style="display:flex;gap:8px;margin-bottom:10px">
       <button class="primary" onclick="addClient()"><i class="ti ti-plus"></i> Add client</button>
+      <button class="danger" style="border:1px solid #E24B4A;padding:6px 12px" onclick="removeLastClient()"><i class="ti ti-minus"></i> Remove client</button>
     </div>
     <div class="card" style="margin-top:4px;margin-bottom:10px">
       <div class="slabel">Shared deductions</div>
@@ -301,6 +301,17 @@ function addClient(data) {
       '</div>' +
     '</div>' +
 
+    '<div style="margin-bottom:10px">' +
+      '<div style="font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Plants</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">' +
+        '<label class="inline-check" style="font-size:13px;font-weight:400"><input type="checkbox" id="' + id + '-planted-cb" onchange="togglePlanted(\'' + id + '\')" style="width:16px;height:16px"> Plants used?</label>' +
+      '</div>' +
+      '<div id="' + id + '-planted-section" style="display:none;margin-bottom:6px">' +
+        '<div class="spray-hdr" style="grid-template-columns:1fr 30px"><span>What was planted?</span><span></span></div>' +
+        '<div id="' + id + '-plants"></div>' +
+        '<button onclick="addPlant(\'' + id + '\')" style="font-size:12px;margin-top:4px"><i class="ti ti-plus"></i> Add plant</button>' +
+      '</div>' +
+    '</div>' +
     '<div class="slabel">Sprays</div>' +
     '<div class="spray-hdr"><span>Product</span><span>Gallons</span><span>Rate (e.g. 1tsp/gal)</span><span></span></div>' +
     '<div id="' + id + '-sprays"></div>' +
@@ -315,27 +326,23 @@ function addClient(data) {
       '<div><label style="font-size:12px;color:#BA7517;display:block;margin-bottom:3px">Plastic hauled</label><input type="number" min="0" placeholder="0" id="' + id + '-plastic-hauled"></div>' +
     '</div>' +
 
+
     '<hr class="divider">' +
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">' +
-      '<label class="inline-check" style="font-size:13px;font-weight:400"><input type="checkbox" id="' + id + '-planted-cb" onchange="togglePlanted(\'' + id + '\')" style="width:16px;height:16px"> Plants</label>' +
-    '</div>' +
-    '<div id="' + id + '-planted-section" style="display:none;margin-bottom:10px">' +
-      '<div class="spray-hdr" style="grid-template-columns:1fr 30px"><span>What was planted?</span><span></span></div>' +
-      '<div id="' + id + '-plants"></div>' +
-      '<button onclick="addPlant(\'' + id + '\')" style="font-size:12px;margin-top:4px"><i class="ti ti-plus"></i> Add plant</button>' +
-    '</div>' +
-    '<hr class="divider">' +
-    '<div class="g4" id="' + id + '-metrics">' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px">' +
       '<div class="metric" style="border:1px dashed #d0c090">' +
         '<div class="metric-label">Est. budget</div>' +
-        '<div class="metric-val" id="' + id + '-budget">—</div>' +
+        '<div style="font-size:15px;font-weight:500" id="' + id + '-budget">—</div>' +
         '<div class="ref-note">For reference only</div>' +
       '</div>' +
-      '<div class="metric"><div class="metric-label">Worked</div><div class="metric-val" id="' + id + '-worked">0.00</div></div>' +
-      '<div class="metric"><div class="metric-label">Deduct</div><div class="metric-val" id="' + id + '-deduct">—</div></div>' +
+      '<div class="metric"><div class="metric-label">Worked</div><div style="font-size:15px;font-weight:500" id="' + id + '-worked">0.00</div></div>' +
+      '<div class="metric" style="border:1px dashed #d0c090">' +
+        '<div class="metric-label">Deduct</div>' +
+        '<div style="font-size:13px;font-weight:500" id="' + id + '-deduct">—</div>' +
+        '<div class="ref-note">For reference only</div>' +
+      '</div>' +
       '<div class="metric" style="border:1px dashed #d0c090">' +
         '<div class="metric-label">Remaining</div>' +
-        '<div class="metric-val" id="' + id + '-remaining">—</div>' +
+        '<div style="font-size:15px;font-weight:500" id="' + id + '-remaining">—</div>' +
         '<div class="ref-note">For reference only</div>' +
       '</div>' +
     '</div>' +
@@ -416,6 +423,15 @@ function addPlant(cid, val) {
 }
 
 function removeClient(id) { document.getElementById(id).remove(); recalcAll(); }
+
+function removeLastClient() {
+  const cards = document.querySelectorAll('.client-card');
+  if (cards.length === 0) { showToast('No clients to remove'); return; }
+  if (confirm('Remove the last client card?')) {
+    cards[cards.length - 1].remove();
+    recalcAll();
+  }
+}
 
 function parseMilitary(val) {
   // accepts 0800, 800, 830, 1530 etc
