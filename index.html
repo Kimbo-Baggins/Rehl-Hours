@@ -11,8 +11,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .app-wrap{max-width:740px;margin:0 auto;padding:16px}
 input,select,button{font-family:inherit;font-size:13px}
 input[type=text],input[type=number],input[type=email]{border:1px solid #d0d0cc;border-radius:8px;padding:6px 9px;background:#fff;color:#1a1a1a;width:100%}
-input[type=number].time-input{border:1px solid #d0d0cc;border-radius:8px;padding:6px 9px;background:#fff;color:#1a1a1a;width:100%;-moz-appearance:textfield}
-input[type=number].time-input::-webkit-inner-spin-button,input[type=number].time-input::-webkit-outer-spin-button{-webkit-appearance:none}
+
 input:focus{outline:none;box-shadow:0 0 0 2px #9FE1CB;border-color:#1D9E75}
 input[type=checkbox]{width:15px;height:15px;accent-color:#1D9E75;cursor:pointer;flex-shrink:0}
 button{cursor:pointer;border-radius:8px;padding:6px 12px;border:1px solid #d0d0cc;background:#fff;color:#1a1a1a;transition:background 0.15s}
@@ -35,13 +34,11 @@ button.warn-btn:hover{background:#FAEEDA}
 .ok{background:#EAF3DE;color:#3B6D11}
 .warn{background:#FAEEDA;color:#854F0B}
 .row{display:flex;gap:8px;align-items:center;margin-bottom:6px}
-.emp-header{display:grid;grid-template-columns:1fr 90px 90px 74px 30px;gap:6px;margin-bottom:4px}
+.emp-header{display:grid;grid-template-columns:1fr 80px 80px 74px 30px;gap:6px;margin-bottom:4px}
 .emp-header span{font-size:11px;color:#888;text-align:center}
 .emp-header span:first-child{text-align:left}
-.emp-row{display:grid;grid-template-columns:1fr 90px 90px 74px 30px;gap:6px;align-items:center;margin-bottom:5px}
-.time-wrap{display:flex;align-items:center;gap:2px}
-.time-wrap input{width:44px;text-align:center}
-.time-sep{font-size:14px;font-weight:600;color:#888;line-height:1}
+.emp-row{display:grid;grid-template-columns:1fr 80px 80px 74px 30px;gap:6px;align-items:center;margin-bottom:5px}
+.time-field{width:76px;text-align:center;letter-spacing:2px}
 .divider{border:none;border-top:1px solid #ebebea;margin:12px 0}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
@@ -87,12 +84,9 @@ button.warn-btn:hover{background:#FAEEDA}
     </div>
   </div>
 
-  <div id="nav" class="nav"></div>
-
-  <!-- SETUP -->
-  <div id="step-setup" class="step active card">
-    <div class="slabel">Day setup</div>
-    <div class="g2" style="margin-bottom:14px">
+  <!-- SETUP INLINE -->
+  <div class="card" style="margin-bottom:12px">
+    <div class="g2" style="margin-bottom:12px">
       <div>
         <label style="font-size:12px;color:#888;display:block;margin-bottom:3px">Supervisor</label>
         <input type="text" id="sup-name" placeholder="Your name">
@@ -102,49 +96,43 @@ button.warn-btn:hover{background:#FAEEDA}
         <input type="email" id="sup-email" placeholder="your@email.com">
       </div>
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <div class="slabel" style="margin:0">Crew</div>
-      <button onclick="addCrewInput()"><i class="ti ti-plus"></i> Add</button>
-    </div>
-    <div id="crew-inputs"></div>
-    <hr class="divider">
-    <div class="g2">
-      <div>
-        <label style="font-size:12px;color:#888;display:block;margin-bottom:3px">
-          Total lunch estimated (min)
-          <span class="tip" data-tip="Add up each employee's lunch. Example: 3 employees x 30 min = 90 minutes.">i</span>
-        </label>
-        <input type="number" id="lunch-total" value="0" min="0" onchange="recalcAll()">
-      </div>
-      <div>
-        <label style="font-size:12px;color:#888;display:block;margin-bottom:3px">
-          Total travel time estimated (min)
-          <span class="tip" data-tip="Add up each employee's travel time. Include door-to-door time or the number of minutes from your client spreadsheet.">i</span>
-        </label>
-        <input type="number" id="travel-total" value="0" min="0" onchange="recalcAll()">
-      </div>
-    </div>
-    <div style="text-align:right;margin-top:14px">
-      <button class="primary" onclick="goToClients()">Clients <i class="ti ti-arrow-right"></i></button>
-    </div>
   </div>
 
   <!-- CLIENTS -->
-  <div id="step-clients" class="step">
+  <div id="step-main" class="step active">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <span style="font-size:16px;font-weight:600">Clients</span>
       <button class="primary" onclick="addClient()"><i class="ti ti-plus"></i> Add client</button>
     </div>
-    <div class="card" style="margin-bottom:10px">
-      <div class="g3">
+    <div id="clients-list"></div>
+    <div style="margin-bottom:10px">
+      <button class="primary" onclick="addClient()"><i class="ti ti-plus"></i> Add client</button>
+    </div>
+    <div class="card" style="margin-top:4px;margin-bottom:10px">
+      <div class="slabel">Shared deductions</div>
+      <div class="g2">
+        <div>
+          <label style="font-size:12px;color:#888;display:block;margin-bottom:3px">
+            Total lunch estimated (min)
+            <span class="tip" data-tip="Add up each employee's lunch. Example: 3 employees x 30 min = 90 minutes.">i</span>
+          </label>
+          <input type="number" id="lunch-total" value="0" min="0" onchange="recalcAll()">
+        </div>
+        <div>
+          <label style="font-size:12px;color:#888;display:block;margin-bottom:3px">
+            Total travel time estimated (min)
+            <span class="tip" data-tip="Add up each employee's travel time. Include door-to-door time or the number of minutes from your client spreadsheet.">i</span>
+          </label>
+          <input type="number" id="travel-total" value="0" min="0" onchange="recalcAll()">
+        </div>
+      </div>
+      <div class="g3" style="margin-top:10px">
         <div class="metric"><div class="metric-label">Lunch estimated</div><div class="metric-val" id="lunch-disp">0 min</div></div>
         <div class="metric"><div class="metric-label">Travel estimated</div><div class="metric-val" id="travel-disp">0 min</div></div>
         <div class="metric"><div class="metric-label">Per-client deduct</div><div class="metric-val" id="per-client-disp">—</div></div>
       </div>
     </div>
-    <div id="clients-list"></div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
-      <button class="primary" onclick="addClient()"><i class="ti ti-plus"></i> Add client</button>
+    <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:12px">
       <button class="primary" onclick="showStep('step-summary')">Day summary <i class="ti ti-arrow-right"></i></button>
     </div>
   </div>
@@ -154,7 +142,7 @@ button.warn-btn:hover{background:#FAEEDA}
     <div style="font-size:16px;font-weight:600;margin-bottom:12px">Day summary</div>
     <div id="summary-content"></div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      <button onclick="showStep('step-clients')"><i class="ti ti-arrow-left"></i> Back</button>
+      <button onclick="showStep('step-main')"><i class="ti ti-arrow-left"></i> Back</button>
       <button class="save-btn" onclick="saveDay()"><i class="ti ti-device-floppy"></i> Save</button>
       <button class="primary" onclick="submitReport()"><i class="ti ti-send"></i> Submit report</button>
     </div>
@@ -175,7 +163,6 @@ function init() {
     try { restoreDay(JSON.parse(saved)); showToast('Restored saved data'); }
     catch(e) { /* start fresh */ }
   }
-  buildNav();
 }
 
 function confirmNewDay() {
@@ -185,22 +172,11 @@ function confirmNewDay() {
   }
 }
 
-function buildNav() {
-  const nav = document.getElementById('nav');
-  nav.innerHTML = '';
-  [['step-setup','Setup'],['step-clients','Clients'],['step-summary','Summary']].forEach(function(pair) {
-    const b = document.createElement('button');
-    b.className = 'nav-btn' + (document.getElementById(pair[0]).classList.contains('active') ? ' active' : '');
-    b.textContent = pair[1];
-    b.onclick = (function(id){ return function(){ showStep(id); }; })(pair[0]);
-    nav.appendChild(b);
-  });
-}
+function buildNav() {}
 
 function showStep(id) {
   document.querySelectorAll('.step').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
-  buildNav();
   if (id === 'step-summary') renderSummary();
 }
 
@@ -210,25 +186,31 @@ function showToast(msg) {
   setTimeout(function(){ t.classList.remove('show'); }, 2400);
 }
 
-function addCrewInput(name) {
+function addCrewInput(name, skipSync) {
   name = name || '';
   const d = document.getElementById('crew-inputs');
   const row = document.createElement('div');
   row.className = 'row';
-  row.innerHTML = '<input type="text" placeholder="Name" value="' + name + '" style="max-width:200px">' +
-    '<button class="danger" onclick="this.parentElement.remove()"><i class="ti ti-trash"></i></button>';
+  row.innerHTML = '<input type="text" placeholder="Name" value="' + name + '" style="max-width:200px" oninput="syncCrewNameToClients(this)">' +
+    '<button class="danger" onclick="this.parentElement.remove();"><i class="ti ti-trash"></i></button>';
   d.appendChild(row);
+  // If crew member has a name and clients exist, add them to all existing client cards
+  if (!skipSync && name) {
+    document.querySelectorAll('.client-card').forEach(function(card) {
+      card.querySelector('.emp-rows').insertAdjacentHTML('beforeend', empRow(name));
+    });
+  }
+}
+
+function syncCrewNameToClients(input) {
+  // not auto-syncing edits to existing rows - just used for new additions
 }
 
 function getCrew() {
   return [...document.querySelectorAll('#crew-inputs input')].map(function(i){ return i.value.trim(); }).filter(Boolean);
 }
 
-function goToClients() {
-  loadSharedDeduct();
-  showStep('step-clients');
-  if (!document.querySelector('.client-card')) addClient();
-}
+
 
 function loadSharedDeduct() {
   const l = parseFloat(document.getElementById('lunch-total').value) || 0;
@@ -285,7 +267,7 @@ function getTimeStr(row, index) {
 
 function addClient(data) {
   const id = 'c' + clientCount++;
-  const crew = getCrew();
+  const crew = data ? (data.employees ? data.employees.map(function(e){ return e.name; }) : []) : getCrew();
   const list = document.getElementById('clients-list');
   const card = document.createElement('div');
   card.className = 'card client-card';
@@ -334,12 +316,13 @@ function addClient(data) {
     '</div>' +
 
     '<hr class="divider">' +
-    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">' +
-      '<label class="inline-check" style="font-size:13px;font-weight:500"><input type="checkbox" id="' + id + '-planted-cb" onchange="togglePlanted(\'' + id + '\')" style="width:16px;height:16px"> Planted?</label>' +
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">' +
+      '<label class="inline-check" style="font-size:13px;font-weight:400"><input type="checkbox" id="' + id + '-planted-cb" onchange="togglePlanted(\'' + id + '\')" style="width:16px;height:16px"> Plants</label>' +
     '</div>' +
-    '<div id="' + id + '-planted-row" style="display:none;margin-bottom:10px">' +
-      '<label style="font-size:12px;color:#888;display:block;margin-bottom:3px">What was planted?</label>' +
-      '<input type="text" placeholder="e.g. 24 pansies" id="' + id + '-planted-txt" style="max-width:300px">' +
+    '<div id="' + id + '-planted-section" style="display:none;margin-bottom:10px">' +
+      '<div class="spray-hdr" style="grid-template-columns:1fr 30px"><span>What was planted?</span><span></span></div>' +
+      '<div id="' + id + '-plants"></div>' +
+      '<button onclick="addPlant(\'' + id + '\')" style="font-size:12px;margin-top:4px"><i class="ti ti-plus"></i> Add plant</button>' +
     '</div>' +
     '<hr class="divider">' +
     '<div class="g4" id="' + id + '-metrics">' +
@@ -363,6 +346,10 @@ function addClient(data) {
         '<span id="' + id + '-lunch-ref" style="font-size:16px;font-weight:500">—</span>' +
         '<span style="color:#888">min across all clients</span>' +
       '</div>' +
+    '</div>' +
+    '<div style="margin-top:10px">' +
+      '<label style="font-size:12px;color:#888;display:block;margin-bottom:3px">Notes</label>' +
+      '<textarea id="' + id + '-notes" placeholder="Free notes for this client..." rows="3" style="width:100%;border:1px solid #d0d0cc;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:13px;resize:vertical;background:#fff;color:#1a1a1a;line-height:1.5"></textarea>' +
     '</div>';
 
   list.appendChild(card);
@@ -370,27 +357,27 @@ function addClient(data) {
   recalcAll();
 }
 
-function empRow(name, startH, startM, endH, endM) {
-  name = name || ''; startH = startH || ''; startM = startM || ''; endH = endH || ''; endM = endM || '';
+function empRow(name, start, end) {
+  name = name || ''; start = start || ''; end = end || '';
   return '<div class="emp-row">' +
     '<input type="text" placeholder="Name" value="' + name + '" oninput="recalcAll()">' +
-    '<div class="time-wrap">' +
-      '<input type="number" class="time-input" placeholder="HH" min="0" max="23" value="' + startH + '" oninput="enforceHour(this);recalcAll()" style="width:44px;text-align:center">' +
-      '<span class="time-sep">:</span>' +
-      '<input type="number" class="time-input" placeholder="MM" min="0" max="59" value="' + startM + '" oninput="enforceMin(this);recalcAll()" style="width:44px;text-align:center">' +
-    '</div>' +
-    '<div class="time-wrap">' +
-      '<input type="number" class="time-input" placeholder="HH" min="0" max="23" value="' + endH + '" oninput="enforceHour(this);recalcAll()" style="width:44px;text-align:center">' +
-      '<span class="time-sep">:</span>' +
-      '<input type="number" class="time-input" placeholder="MM" min="0" max="59" value="' + endM + '" oninput="enforceMin(this);recalcAll()" style="width:44px;text-align:center">' +
-    '</div>' +
+    '<input type="text" class="time-field" placeholder="0800" maxlength="4" value="' + start + '" oninput="recalcAll()" style="border:1px solid #d0d0cc;border-radius:8px;padding:6px 4px">' +
+    '<input type="text" class="time-field" placeholder="1700" maxlength="4" value="' + end + '" oninput="recalcAll()" style="border:1px solid #d0d0cc;border-radius:8px;padding:6px 4px">' +
     '<input type="text" readonly placeholder="0.00" style="background:#f5f5f3;text-align:center;font-size:12px;border:1px solid #e8e8e4;border-radius:8px;padding:6px 4px">' +
     '<button class="danger" onclick="this.parentElement.remove();recalcAll()" style="padding:3px 6px"><i class="ti ti-x"></i></button>' +
     '</div>';
 }
 
 function addEmpRow(cid) {
-  document.getElementById(cid + '-emps').insertAdjacentHTML('beforeend', empRow());
+  const container = document.getElementById(cid + '-emps');
+  const firstRow = container.querySelector('.emp-row');
+  var start = '', end = '';
+  if (firstRow) {
+    const timeIns = firstRow.querySelectorAll('input.time-field');
+    if (timeIns[0]) start = timeIns[0].value;
+    if (timeIns[1]) end = timeIns[1].value;
+  }
+  container.insertAdjacentHTML('beforeend', empRow('', start, end));
 }
 
 function addSpray(cid, name, gal, rate) {
@@ -411,27 +398,50 @@ function toggleRoses(cid) {
 
 function togglePlanted(cid) {
   const cb = document.getElementById(cid + '-planted-cb');
-  document.getElementById(cid + '-planted-row').style.display = cb.checked ? 'block' : 'none';
+  const section = document.getElementById(cid + '-planted-section');
+  section.style.display = cb.checked ? 'block' : 'none';
+  if (cb.checked && document.getElementById(cid + '-plants').children.length === 0) {
+    addPlant(cid);
+  }
+}
+
+function addPlant(cid, val) {
+  val = val || '';
+  document.getElementById(cid + '-plants').insertAdjacentHTML('beforeend',
+    '<div style="display:grid;grid-template-columns:1fr 30px;gap:6px;align-items:center;margin-bottom:5px">' +
+      '<input type="text" placeholder="e.g. 24 pansies" value="' + val + '">' +
+      '<button class="danger" onclick="this.parentElement.remove()" style="padding:3px 6px"><i class="ti ti-x"></i></button>' +
+    '</div>'
+  );
 }
 
 function removeClient(id) { document.getElementById(id).remove(); recalcAll(); }
 
+function parseMilitary(val) {
+  // accepts 0800, 800, 830, 1530 etc
+  val = (val || '').replace(/[^0-9]/g, '');
+  if (val.length === 0) return null;
+  var h, m;
+  if (val.length <= 2) { h = parseInt(val); m = 0; }
+  else { h = parseInt(val.slice(0, -2)); m = parseInt(val.slice(-2)); }
+  if (isNaN(h) || isNaN(m) || h > 23 || m > 59) return null;
+  return h + m / 60;
+}
+
 function getMilitaryTime(row, index) {
-  const wraps = row.querySelectorAll('.time-wrap');
-  if (!wraps[index]) return null;
-  const ins = wraps[index].querySelectorAll('input');
-  const h = parseInt(ins[0].value);
-  const m = parseInt(ins[1].value);
-  if (isNaN(h)) return null;
-  return h + (isNaN(m) ? 0 : m) / 60;
+  const ins = row.querySelectorAll('input.time-field');
+  if (!ins[index]) return null;
+  return parseMilitary(ins[index].value);
 }
 
 function getMilitaryStr(row, index) {
-  const wraps = row.querySelectorAll('.time-wrap');
-  if (!wraps[index]) return '—';
-  const ins = wraps[index].querySelectorAll('input');
-  const h = ins[0].value; const m = ins[1].value;
-  if (h === '' && m === '') return '—';
+  const ins = row.querySelectorAll('input.time-field');
+  if (!ins[index] || !ins[index].value) return '—';
+  const val = ins[index].value.replace(/[^0-9]/g, '');
+  if (!val) return '—';
+  var h, m;
+  if (val.length <= 2) { h = parseInt(val); m = 0; }
+  else { h = parseInt(val.slice(0, -2)); m = parseInt(val.slice(-2)); }
   return String(h||0).padStart(2,'0') + ':' + String(m||0).padStart(2,'0');
 }
 
@@ -449,8 +459,9 @@ function recalcClient(id) {
   const budget = parseFloat(card.querySelectorAll('input[type=number]')[0].value) || null;
   let totalWorked = 0;
   card.querySelectorAll('.emp-row').forEach(function(row) {
-    const s = getMilitaryTime(row, 0);
-    const e = getMilitaryTime(row, 1);
+    const timeIns = row.querySelectorAll('input.time-field');
+    const s = timeIns[0] ? parseMilitary(timeIns[0].value) : null;
+    const e = timeIns[1] ? parseMilitary(timeIns[1].value) : null;
     const hrs = (s !== null && e !== null && e > s) ? e - s : 0;
     const out = row.querySelector('input[readonly]');
     if (out) out.value = hrs > 0 ? hrs.toFixed(2) + ' hr' : '';
@@ -486,8 +497,13 @@ function getClientData(card) {
   const paperHauled = parseInt(document.getElementById(id + '-paper-hauled').value) || 0;
   const plasticLeft = parseInt(document.getElementById(id + '-plastic-left').value) || 0;
   const plasticHauled = parseInt(document.getElementById(id + '-plastic-hauled').value) || 0;
+  const notes = document.getElementById(id + '-notes') ? document.getElementById(id + '-notes').value || '' : '';
   const plantedOn = document.getElementById(id + '-planted-cb').checked || false;
-  const plantedTxt = document.getElementById(id + '-planted-txt') ? document.getElementById(id + '-planted-txt').value || '' : '';
+  const plants = [];
+  const plantsContainer = document.getElementById(id + '-plants');
+  if (plantsContainer) {
+    plantsContainer.querySelectorAll('input[type=text]').forEach(function(i){ if(i.value) plants.push(i.value); });
+  }
   const sprays = [];
   card.querySelectorAll('.spray-row').forEach(function(row) {
     const ins = row.querySelectorAll('input');
@@ -496,15 +512,13 @@ function getClientData(card) {
   const employees = [];
   card.querySelectorAll('.emp-row').forEach(function(row) {
     const nameIn = row.querySelector('input[type=text]');
-    const wraps = row.querySelectorAll('.time-wrap');
-    const sIns = wraps[0] ? wraps[0].querySelectorAll('input') : [];
-    const eIns = wraps[1] ? wraps[1].querySelectorAll('input') : [];
+    const timeIns = row.querySelectorAll('input.time-field');
     const out = row.querySelector('input[readonly]');
     if (nameIn && nameIn.value) {
       employees.push({
         name: nameIn.value,
-        startH: sIns[0] ? sIns[0].value : '', startM: sIns[1] ? sIns[1].value : '',
-        endH: eIns[0] ? eIns[0].value : '', endM: eIns[1] ? eIns[1].value : '',
+        start: timeIns[0] ? timeIns[0].value : '',
+        end: timeIns[1] ? timeIns[1].value : '',
         hrs: out ? out.value : ''
       });
     }
@@ -512,7 +526,7 @@ function getClientData(card) {
   return {id:id, name:name, budget:budget, worked:worked, deduct:deduct, remaining:remaining,
     scram:scram, roseOn:roseOn, roseN:roseN,
     paperLeft:paperLeft, paperHauled:paperHauled, plasticLeft:plasticLeft, plasticHauled:plasticHauled,
-    sprays:sprays, employees:employees, plantedOn:plantedOn, plantedTxt:plantedTxt};
+    sprays:sprays, employees:employees, plantedOn:plantedOn, plants:plants, notes:notes};
 }
 
 function saveDay() {
@@ -537,9 +551,10 @@ function restoreDay(data) {
   if (data.lunch) document.getElementById('lunch-total').value = data.lunch;
   if (data.travel) document.getElementById('travel-total').value = data.travel;
   document.getElementById('crew-inputs').innerHTML = '';
-  (data.crew || []).forEach(function(n){ addCrewInput(n); });
+  (data.crew || []).forEach(function(n){ addCrewInput(n, true); });
   (data.clients || []).forEach(function(c){ addClient(c); });
   recalcAll();
+  loadSharedDeduct();
 }
 
 function restoreClientData(id, d) {
@@ -558,14 +573,22 @@ function restoreClientData(id, d) {
   if (empContainer && d.employees && d.employees.length) {
     empContainer.innerHTML = '';
     d.employees.forEach(function(e){
-      empContainer.insertAdjacentHTML('beforeend', empRow(e.name, e.startH||'', e.startM||'', e.endH||'', e.endM||''));
+      empContainer.insertAdjacentHTML('beforeend', empRow(e.name, e.start||'', e.end||''));
     });
   }
   (d.sprays || []).forEach(function(s){ addSpray(id, s.name, s.gallons, s.rate); });
+  const notesEl = document.getElementById(id + '-notes');
+  if (notesEl && d.notes) notesEl.value = d.notes;
   const plantedCb = document.getElementById(id + '-planted-cb');
-  if (plantedCb && d.plantedOn) { plantedCb.checked = true; togglePlanted(id); }
-  const plantedTxt = document.getElementById(id + '-planted-txt');
-  if (plantedTxt && d.plantedTxt) plantedTxt.value = d.plantedTxt;
+  if (plantedCb && d.plantedOn) {
+    plantedCb.checked = true;
+    togglePlanted(id);
+    const plantsContainer = document.getElementById(id + '-plants');
+    if (plantsContainer && d.plants && d.plants.length) {
+      plantsContainer.innerHTML = '';
+      d.plants.forEach(function(p){ addPlant(id, p); });
+    }
+  }
 }
 
 function renderSummary() {
@@ -607,11 +630,12 @@ function renderSummary() {
           return '<span>' + e.name + ': ' + st + ' &rarr; ' + en + ' (' + (e.hrs||'0 hr') + ')</span>';
         }).join('') +
       '</div>' +
+      (d.notes ? '<div style="margin-bottom:8px;font-size:13px;color:#555;background:#f5f5f3;border-radius:8px;padding:8px 10px;line-height:1.5">' + d.notes.replace(/\n/g,'<br>') + '</div>' : '') +
       '<hr class="divider" style="margin:7px 0">' +
       '<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12px;margin-bottom:8px">' +
         '<span><i class="ti ti-package" style="font-size:12px"></i> Scram: <strong>' + d.scram + ' cups</strong></span>' +
         (d.roseOn ? '<span><i class="ti ti-flower" style="font-size:12px"></i> Rosetone: <strong>' + d.roseN + ' roses</strong></span>' : '') +
-        (d.plantedOn ? '<span><i class="ti ti-seeding" style="font-size:12px"></i> Planted: <strong>' + (d.plantedTxt||'yes') + '</strong></span>' : '') +
+        (d.plantedOn && d.plants && d.plants.length ? d.plants.map(function(p){ return '<span><i class="ti ti-seeding" style="font-size:12px"></i> <strong>' + p + '</strong></span>'; }).join('') : '') +
         d.sprays.map(function(s){ return '<span><i class="ti ti-droplet" style="font-size:12px"></i> ' + s.name + ': <strong>' + s.gallons + 'gal @ ' + s.rate + '</strong></span>'; }).join('') +
       '</div>' +
       '<div class="bag-grid">' +
@@ -693,7 +717,7 @@ function buildEmailBody(sup, crew, l, t, cards, date) {
       '<tr><td colspan="3" style="padding:8px 12px;border-top:1px solid #e8e8e4;font-size:13px">' +
         '<strong>Scram:</strong> ' + d.scram + ' cups' +
         (d.roseOn ? ' &nbsp;|&nbsp; <strong>Rosetone:</strong> ' + d.roseN + ' roses' : '') +
-        (d.plantedOn ? ' &nbsp;|&nbsp; <strong>Planted:</strong> ' + (d.plantedTxt||'yes') : '') +
+        (d.plantedOn && d.plants && d.plants.length ? ' &nbsp;|&nbsp; <strong>Plants:</strong> ' + d.plants.join(', ') : '') +
         (d.sprays.length ? '<ul style="margin:6px 0 0 16px">' + sprayRows + '</ul>' : '') +
       '</td></tr>' +
       '<tr><td colspan="3" style="padding:8px 12px;border-top:1px solid #e8e8e4">' +
@@ -704,6 +728,7 @@ function buildEmailBody(sup, crew, l, t, cards, date) {
           '<td style="font-size:13px"><span style="color:#BA7517">&#9632;</span> Plastic hauled: <strong>' + d.plasticHauled + '</strong></td>' +
         '</tr></table>' +
       '</td></tr>' +
+    notesHtml +
     '</table></td></tr>';
   });
 
@@ -788,15 +813,15 @@ function buildPlainText(sup, crew, l, t, cards, date) {
     body += 'CLIENT: ' + d.name + '\n';
     body += '  Hours worked: ' + d.worked.toFixed(2) + ' | Deduction: ' + d.deduct.toFixed(2) + ' | Net: ' + (d.worked - d.deduct).toFixed(2) + '\n';
     d.employees.forEach(function(e){
-      const st = String(e.startH||0).padStart(2,'0') + ':' + String(e.startM||0).padStart(2,'0');
-      const en = String(e.endH||0).padStart(2,'0') + ':' + String(e.endM||0).padStart(2,'0');
-      body += '  ' + e.name + ': ' + st + ' to ' + en + ' (' + (e.hrs||'0 hr') + ')\n';
+      body += '  ' + e.name + ': ' + (e.start||'—') + ' to ' + (e.end||'—') + ' (' + (e.hrs||'0 hr') + ')\n';
     });
     body += '  Scram: ' + d.scram + ' cups\n';
     if (d.roseOn) body += '  Rosetone: yes — ' + d.roseN + ' roses\n';
     d.sprays.forEach(function(s){ body += '  Spray: ' + s.name + ' — ' + s.gallons + ' gal @ ' + s.rate + '\n'; });
     body += '  Paper: ' + d.paperLeft + ' left, ' + d.paperHauled + ' hauled\n';
-    body += '  Plastic: ' + d.plasticLeft + ' left, ' + d.plasticHauled + ' hauled\n\n';
+    body += '  Plastic: ' + d.plasticLeft + ' left, ' + d.plasticHauled + ' hauled\n';
+    if (d.notes) body += '  Notes: ' + d.notes + '\n';
+    body += '\n';
   });
   return body;
 }
