@@ -143,7 +143,8 @@ button.warn-btn:hover{background:#FAEEDA}
       </div>
     </div>
     <div id="clients-list"></div>
-    <div style="text-align:right;margin-top:6px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px">
+      <button class="primary" onclick="addClient()"><i class="ti ti-plus"></i> Add client</button>
       <button class="primary" onclick="showStep('step-summary')">Day summary <i class="ti ti-arrow-right"></i></button>
     </div>
   </div>
@@ -163,7 +164,7 @@ button.warn-btn:hover{background:#FAEEDA}
 <script>
 let clientCount = 0;
 const SAVE_KEY = 'rehlhours_v3';
-const REPORT_EMAIL = 'kim.d.devore@gmail.com';
+const REPORT_EMAIL = document.getElementById('sup-email').value || 'kim.d.devore@gmail.com';
 
 function init() {
   localStorage.removeItem('rehlhours_day');
@@ -333,6 +334,14 @@ function addClient(data) {
     '</div>' +
 
     '<hr class="divider">' +
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">' +
+      '<label class="inline-check" style="font-size:13px;font-weight:500"><input type="checkbox" id="' + id + '-planted-cb" onchange="togglePlanted(\'' + id + \'\')" style="width:16px;height:16px"> Planted?</label>' +
+    '</div>' +
+    '<div id="' + id + '-planted-row" style="display:none;margin-bottom:10px">' +
+      '<label style="font-size:12px;color:#888;display:block;margin-bottom:3px">What was planted?</label>' +
+      '<input type="text" placeholder="e.g. 24 pansies" id="' + id + '-planted-txt" style="max-width:300px">' +
+    '</div>' +
+    '<hr class="divider">' +
     '<div class="g4" id="' + id + '-metrics">' +
       '<div class="metric" style="border:1px dashed #d0c090">' +
         '<div class="metric-label">Est. budget</div>' +
@@ -398,6 +407,11 @@ function addSpray(cid, name, gal, rate) {
 function toggleRoses(cid) {
   const cb = document.getElementById(cid + '-rose-cb');
   document.getElementById(cid + '-rose-row').style.display = cb.checked ? 'flex' : 'none';
+}
+
+function togglePlanted(cid) {
+  const cb = document.getElementById(cid + '-planted-cb');
+  document.getElementById(cid + '-planted-row').style.display = cb.checked ? 'block' : 'none';
 }
 
 function removeClient(id) { document.getElementById(id).remove(); recalcAll(); }
@@ -472,6 +486,8 @@ function getClientData(card) {
   const paperHauled = parseInt(document.getElementById(id + '-paper-hauled').value) || 0;
   const plasticLeft = parseInt(document.getElementById(id + '-plastic-left').value) || 0;
   const plasticHauled = parseInt(document.getElementById(id + '-plastic-hauled').value) || 0;
+  const plantedOn = document.getElementById(id + '-planted-cb').checked || false;
+  const plantedTxt = document.getElementById(id + '-planted-txt') ? document.getElementById(id + '-planted-txt').value || '' : '';
   const sprays = [];
   card.querySelectorAll('.spray-row').forEach(function(row) {
     const ins = row.querySelectorAll('input');
@@ -496,7 +512,7 @@ function getClientData(card) {
   return {id:id, name:name, budget:budget, worked:worked, deduct:deduct, remaining:remaining,
     scram:scram, roseOn:roseOn, roseN:roseN,
     paperLeft:paperLeft, paperHauled:paperHauled, plasticLeft:plasticLeft, plasticHauled:plasticHauled,
-    sprays:sprays, employees:employees};
+    sprays:sprays, employees:employees, plantedOn:plantedOn, plantedTxt:plantedTxt};
 }
 
 function saveDay() {
@@ -546,6 +562,10 @@ function restoreClientData(id, d) {
     });
   }
   (d.sprays || []).forEach(function(s){ addSpray(id, s.name, s.gallons, s.rate); });
+  const plantedCb = document.getElementById(id + '-planted-cb');
+  if (plantedCb && d.plantedOn) { plantedCb.checked = true; togglePlanted(id); }
+  const plantedTxt = document.getElementById(id + '-planted-txt');
+  if (plantedTxt && d.plantedTxt) plantedTxt.value = d.plantedTxt;
 }
 
 function renderSummary() {
@@ -591,6 +611,7 @@ function renderSummary() {
       '<div style="display:flex;flex-wrap:wrap;gap:10px;font-size:12px;margin-bottom:8px">' +
         '<span><i class="ti ti-package" style="font-size:12px"></i> Scram: <strong>' + d.scram + ' cups</strong></span>' +
         (d.roseOn ? '<span><i class="ti ti-flower" style="font-size:12px"></i> Rosetone: <strong>' + d.roseN + ' roses</strong></span>' : '') +
+        (d.plantedOn ? '<span><i class="ti ti-seeding" style="font-size:12px"></i> Planted: <strong>' + (d.plantedTxt||'yes') + '</strong></span>' : '') +
         d.sprays.map(function(s){ return '<span><i class="ti ti-droplet" style="font-size:12px"></i> ' + s.name + ': <strong>' + s.gallons + 'gal @ ' + s.rate + '</strong></span>'; }).join('') +
       '</div>' +
       '<div class="bag-grid">' +
@@ -672,6 +693,7 @@ function buildEmailBody(sup, crew, l, t, cards, date) {
       '<tr><td colspan="3" style="padding:8px 12px;border-top:1px solid #e8e8e4;font-size:13px">' +
         '<strong>Scram:</strong> ' + d.scram + ' cups' +
         (d.roseOn ? ' &nbsp;|&nbsp; <strong>Rosetone:</strong> ' + d.roseN + ' roses' : '') +
+        (d.plantedOn ? ' &nbsp;|&nbsp; <strong>Planted:</strong> ' + (d.plantedTxt||'yes') : '') +
         (d.sprays.length ? '<ul style="margin:6px 0 0 16px">' + sprayRows + '</ul>' : '') +
       '</td></tr>' +
       '<tr><td colspan="3" style="padding:8px 12px;border-top:1px solid #e8e8e4">' +
@@ -734,7 +756,7 @@ function submitReport() {
 
   const form = document.createElement('form');
   form.method = 'POST';
-  form.action = 'https://formsubmit.co/' + REPORT_EMAIL;
+  form.action = 'https://formsubmit.co/' + getReportEmail();
   form.style.display = 'none';
   const fields = {
     '_subject': subject,
@@ -755,7 +777,7 @@ function submitReport() {
   saveDay();
 
   const emailBody = buildPlainText(sup, crew, l, t, cards, date);
-  window.open('mailto:' + REPORT_EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(emailBody));
+  window.open('mailto:' + getReportEmail() + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(emailBody));
   showToast('Report sent!');
 }
 
